@@ -1,3 +1,5 @@
+//hotel rooms list script
+
 document.addEventListener("DOMContentLoaded", () => {
   const visibleCount = 3;
   const allLists = document.querySelectorAll(".hotel-rooms-list");

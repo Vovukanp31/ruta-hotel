@@ -155,9 +155,8 @@ document.addEventListener("DOMContentLoaded", () => {
             slideChange(swiper) {
               applyCardStackEffect(swiper);
             },
-            breakpoint(swiper, breakpointParams) {
-              console.log("Breakpoint event fired!");
-              console.log("Breakpoint params:", breakpointParams);
+            breakpoint(swiper) {
+              applyCardStackEffect(swiper);
             },
           },
         });

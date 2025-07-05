@@ -32,7 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
       swiper.on("init", () => updateNavState(swiper, nextBtn, prevBtn));
       swiper.on("slideChange", () => updateNavState(swiper, nextBtn, prevBtn));
       updateNavState(swiper, nextBtn, prevBtn);
-      applyCardStackEffect(swiper);
     });
   }
 

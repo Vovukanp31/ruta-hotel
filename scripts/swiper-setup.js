@@ -134,9 +134,9 @@ document.addEventListener("DOMContentLoaded", () => {
           loop: false,
           spaceBetween: spaceBetween,
           breakpoints: {
-            0: {},
-            480: {},
-            768: {},
+            0: { slidesPerView: "auto" },
+            480: { slidesPerView: "auto" },
+            768: { slidesPerView: "auto" },
           },
           on: {
             init(swiper) {

@@ -145,6 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
             applyCardStackEffect(swiper);
           },
           breakpoint(swiper) {
+            console.log("it works");
             applyCardStackEffect(swiper);
           },
         });

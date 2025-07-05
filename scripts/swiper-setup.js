@@ -133,15 +133,16 @@ document.addEventListener("DOMContentLoaded", () => {
           centeredSlides: true,
           loop: false,
           spaceBetween: spaceBetween,
+          breakpoints: {
+            0: {},
+            480: {},
+            768: {},
+          },
           on: {
             init(swiper) {
               applyCardStackEffect(swiper);
             },
             slideChange(swiper) {
-              applyCardStackEffect(swiper);
-            },
-            resize(swiper) {
-              console.log("resize");
               applyCardStackEffect(swiper);
             },
             breakpoint(swiper) {

@@ -141,6 +141,12 @@ document.addEventListener("DOMContentLoaded", () => {
               applyCardStackEffect(swiper);
             },
           },
+          resize(swiper) {
+            applyCardStackEffect(swiper);
+          },
+          breakpoint(swiper) {
+            applyCardStackEffect(swiper);
+          },
         });
       }
     };

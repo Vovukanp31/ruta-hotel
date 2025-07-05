@@ -140,6 +140,12 @@ document.addEventListener("DOMContentLoaded", () => {
             slideChange(swiper) {
               applyCardStackEffect(swiper);
             },
+            resize(swiper) {
+              applyCardStackEffect(swiper);
+            },
+            breakpoint(swiper) {
+              applyCardStackEffect(swiper);
+            },
           },
         });
       }

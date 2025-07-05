@@ -142,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
           },
           resize(swiper) {
+            console.log("resize");
             applyCardStackEffect(swiper);
           },
           breakpoint(swiper) {

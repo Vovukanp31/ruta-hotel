@@ -32,9 +32,19 @@ document.addEventListener("DOMContentLoaded", () => {
       swiper.on("init", () => updateNavState(swiper, nextBtn, prevBtn));
       swiper.on("slideChange", () => updateNavState(swiper, nextBtn, prevBtn));
       updateNavState(swiper, nextBtn, prevBtn);
+      applyCardStackEffect(swiper);
     });
   }
 
+  /*************  ✨ Windsurf Command ⭐  *************/
+  /**
+   * Updates the state of the navigation buttons of a Swiper instance.
+   * Called on "init" and "slideChange" events.
+   * @param {Object} swiper - the Swiper instance
+   * @param {HTMLElement} nextBtn - the "next" navigation button
+   * @param {HTMLElement} prevBtn - the "previous" navigation button
+   */
+  /*******  49262c01-140e-4c11-aa86-9ef64e644c49  *******/
   function updateNavState(swiper, nextBtn, prevBtn) {
     swiper.isBeginning
       ? prevBtn.classList.add("disabled")
@@ -130,13 +140,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         initCustomSwiper(".swiper-cards", {
           slidesPerView: "auto",
-          centeredSlides: true,
+          centeredSlides: false,
           loop: false,
           spaceBetween: spaceBetween,
           breakpoints: {
-            0: { slidesPerView: "auto" },
-            480: { slidesPerView: "auto" },
-            768: { slidesPerView: "auto" },
+            0: { spaceBetween: -0.3 * slideWidth },
+            480: { spaceBetween: -0.4 * slideWidth },
+            768: { centeredSlides: true },
           },
           on: {
             init(swiper) {
@@ -146,8 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
               applyCardStackEffect(swiper);
             },
             breakpoint(swiper) {
-              console.log("it works");
-              applyCardStackEffect(swiper);
+              console.log("Breakpoint triggered!");
             },
           },
         });

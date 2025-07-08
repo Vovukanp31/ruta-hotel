@@ -7,99 +7,154 @@ document.addEventListener("DOMContentLoaded", () => {
       if (slides.length === 0) return;
 
       const parent = swiperEl.closest(".swiper-slider");
-      const nextBtn = parent?.querySelector(".slider-button-right");
-      const prevBtn = parent?.querySelector(".slider-button-left");
-      if (!parent || !nextBtn || !prevBtn) return;
+      const nextBtns = parent?.querySelectorAll(".slider-button-right") || [];
+      const prevBtns = parent?.querySelectorAll(".slider-button-left") || [];
+      if (!parent || nextBtns.length === 0 || prevBtns.length === 0) return;
 
       const uniqueClass = `${selector
         .replace(".", "")
         .replace(/[^a-zA-Z0-9_-]/g, "")}-instance-${index}`;
       swiperEl.classList.add(uniqueClass);
 
-      const shouldLoop = swiperEl.classList.contains("swiper-loop");
       const isThreePerSlide = swiperEl.classList.contains("swiper-3-per-slide");
 
+      const customBreakpoints = isThreePerSlide
+        ? {
+            768: { slidesPerView: 3, slidesPerGroup: 3 },
+            992: { slidesPerView: 3, slidesPerGroup: 3 },
+          }
+        : {};
+
+      const optionBreakpoints = options.breakpoints || {};
+
+      const mergedBreakpoints = Object.keys({
+        ...customBreakpoints,
+        ...optionBreakpoints,
+      }).reduce((acc, key) => {
+        acc[key] = {
+          ...(customBreakpoints[key] || {}),
+          ...(optionBreakpoints[key] || {}),
+        };
+        return acc;
+      }, {});
+
       const swiper = new Swiper(`.${uniqueClass}`, {
-        navigation: { nextEl: nextBtn, prevEl: prevBtn },
-        loop: shouldLoop,
-        slidesPerView: isThreePerSlide ? 3 : "auto",
-        slidesPerGroup: isThreePerSlide ? 3 : 1,
         ...options,
+        breakpoints: mergedBreakpoints,
       });
 
-      swiperInstances.push({ swiper, swiperEl, nextBtn, prevBtn });
+      nextBtns.forEach((btn) =>
+        btn.addEventListener("click", () => swiper.slideNext())
+      );
+      prevBtns.forEach((btn) =>
+        btn.addEventListener("click", () => swiper.slidePrev())
+      );
 
-      swiper.on("init", () => updateNavState(swiper, nextBtn, prevBtn));
-      swiper.on("slideChange", () => updateNavState(swiper, nextBtn, prevBtn));
-      updateNavState(swiper, nextBtn, prevBtn);
+      swiperInstances.push({ swiper, swiperEl });
+
+      swiper.on("init", () => updateNavState(swiper, nextBtns, prevBtns));
+      swiper.on("slideChange", () =>
+        updateNavState(swiper, nextBtns, prevBtns)
+      );
+      updateNavState(swiper, nextBtns, prevBtns);
     });
   }
 
-  /*************  ✨ Windsurf Command ⭐  *************/
-  /**
-   * Updates the state of the navigation buttons of a Swiper instance.
-   * Called on "init" and "slideChange" events.
-   * @param {Object} swiper - the Swiper instance
-   * @param {HTMLElement} nextBtn - the "next" navigation button
-   * @param {HTMLElement} prevBtn - the "previous" navigation button
-   */
-  /*******  49262c01-140e-4c11-aa86-9ef64e644c49  *******/
-  function updateNavState(swiper, nextBtn, prevBtn) {
-    swiper.isBeginning
-      ? prevBtn.classList.add("disabled")
-      : prevBtn.classList.remove("disabled");
+  function updateNavState(swiper, nextBtns, prevBtns) {
+    const { isEnd, isBeginning } = swiper;
 
-    swiper.isEnd
-      ? nextBtn.classList.add("disabled")
-      : nextBtn.classList.remove("disabled");
+    const toggleButtonState = (btn, state) =>
+      btn.classList[state ? "add" : "remove"]("disabled");
+
+    nextBtns.forEach((btn) => toggleButtonState(btn, isEnd));
+    prevBtns.forEach((btn) => toggleButtonState(btn, isBeginning));
+  }
+
+  function debounce(fn, delay) {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => fn(...args), delay);
+    };
   }
 
   function applyCardStackEffect(swiper) {
-    if (!swiper.el.classList.contains("swiper-cards")) return;
-
-    const totalSlides = swiper.slides.length;
+    const slides = swiper.slides;
     const activeIndex = swiper.activeIndex;
     const maxOffset = 2;
-    const isMobile = window.innerWidth <= 767;
 
-    swiper.slides.forEach((slide, i) => {
-      const rawOffset = i - activeIndex;
-      let offset = rawOffset;
-
-      if (swiper.params.loop) {
-        if (offset < -totalSlides / 2) offset += totalSlides;
-        if (offset > totalSlides / 2) offset -= totalSlides;
-      }
-
-      const hideSlide = isMobile
-        ? offset > maxOffset
-        : offset < 0 || offset > maxOffset;
-
-      if (hideSlide) {
-        slide.style.opacity = "0";
-        slide.style.transform = "scale(0.8)";
-        slide.style.zIndex = "0";
-        slide.style.pointerEvents = "none";
-        return;
-      }
-
-      slide.style.pointerEvents = "auto";
-      const absOffset = offset >= 0 ? offset : 0;
-
-      const scale = 1 - absOffset * 0.2;
-      const zIndex = 10 - absOffset;
-      const translateX = offset * 50;
-
-      slide.style.opacity = "1";
-      slide.style.zIndex = zIndex;
-      slide.style.transform = `translateX(${translateX}px) scale(${scale})`;
-      slide.style.transition =
+    requestAnimationFrame(() => {
+      const transitionStyle =
         "transform 0.5s ease, opacity 0.5s ease, z-index 0.5s ease";
+
+      slides.forEach((slide, index) => {
+        const rawOffset = index - activeIndex;
+        const absOffset = Math.max(0, rawOffset);
+
+        if (rawOffset < 0 || absOffset > maxOffset) {
+          Object.assign(slide.style, {
+            opacity: "0",
+            transform: "scale(0.8)",
+            zIndex: "0",
+            pointerEvents: "none",
+            transition: transitionStyle,
+          });
+        } else {
+          const scale = 1 - absOffset * 0.2;
+          const zIndex = 10 - absOffset;
+          const translateX = rawOffset * 50;
+
+          Object.assign(slide.style, {
+            opacity: "1",
+            pointerEvents: "auto",
+            zIndex: zIndex,
+            transform: `translateX(${translateX}px) scale(${scale})`,
+            transition: transitionStyle,
+          });
+        }
+      });
     });
   }
 
-  window.Webflow ||= [];
-  window.Webflow.push(() => {
+  function applyMobileCardScaleEffect(swiper) {
+    const slides = swiper.slides;
+    const activeIndex = swiper.activeIndex;
+    const transitionStyle = "transform 0.3s ease, opacity 0.3s ease";
+
+    slides.forEach((slide, index) => {
+      const isActive = index === activeIndex;
+      Object.assign(slide.style, {
+        transform: `scale(${isActive ? 1.1 : 0.9})`,
+        opacity: "1",
+        zIndex: isActive ? 2 : 1,
+        pointerEvents: "auto",
+        transition: transitionStyle,
+      });
+    });
+  }
+
+  function resetCardStyles(swiper) {
+    swiper.slides.forEach((slide) => {
+      slide.style.opacity = "";
+      slide.style.transform = "";
+      slide.style.zIndex = "";
+      slide.style.pointerEvents = "";
+      slide.style.transition = "";
+    });
+  }
+
+  function handleCardEffectByWidth(swiper) {
+    const width = window.innerWidth;
+    if (width < 768) {
+      applyMobileCardScaleEffect(swiper);
+    } else if (width >= 768 && width < 992) {
+      resetCardStyles(swiper);
+    } else {
+      applyCardStackEffect(swiper);
+    }
+  }
+
+  function initAllSwipers() {
     const needsBasic = document.querySelector(".basic-swiper");
     const needsGallery = document.querySelector(".gallery-image-slider");
     const needsCard = document.querySelector(".swiper-cards");
@@ -108,16 +163,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const script = document.createElement("script");
     script.src = "https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js";
+
     script.onload = () => {
       if (needsBasic) {
         initCustomSwiper(".basic-swiper", {
-          centeredSlides: false,
-          allowTouchMove: false,
-          spaceBetween: 20,
+          slidesPerView: "auto",
+          slidesPerGroup: 1,
+          centeredSlides: true,
+          allowTouchMove: true,
+          spaceBetween: 8,
           breakpoints: {
-            0: { spaceBetween: 8 },
-            480: { spaceBetween: 12 },
-            767: { spaceBetween: 20 },
+            768: {
+              centeredSlides: false,
+              allowTouchMove: false,
+            },
+            992: {
+              centeredSlides: false,
+              allowTouchMove: false,
+              spaceBetween: 11,
+            },
           },
         });
       }
@@ -134,33 +198,58 @@ document.addEventListener("DOMContentLoaded", () => {
         const sampleSlide = document.querySelector(
           ".swiper-cards .swiper-slide"
         );
-        let slideWidth = sampleSlide?.offsetWidth || 300;
-        const spaceBetween = -0.5 * slideWidth;
+        const slideWidth = sampleSlide?.offsetWidth || 300;
 
         initCustomSwiper(".swiper-cards", {
+          centeredSlides: true,
+          allowTouchMove: true,
           slidesPerView: "auto",
-          centeredSlides: false,
-          loop: false,
-          spaceBetween: spaceBetween,
+          slidesPerGroup: 1,
+          centeredSlides: true,
+          spaceBetween: -0.5 * slideWidth,
           breakpoints: {
-            0: { spaceBetween: -0.3 * slideWidth },
-            480: { spaceBetween: -0.4 * slideWidth },
-            768: { centeredSlides: true },
+            768: {
+              spaceBetween: 8,
+              slidesPerView: "auto",
+              centeredSlides: false,
+              allowTouchMove: false,
+            },
+            992: {
+              spaceBetween: -0.5 * slideWidth,
+              allowTouchMove: false,
+              slidesPerView: 1,
+              centeredSlides: false,
+            },
           },
           on: {
             init(swiper) {
-              applyCardStackEffect(swiper);
+              handleCardEffectByWidth(swiper);
             },
             slideChange(swiper) {
-              applyCardStackEffect(swiper);
+              handleCardEffectByWidth(swiper);
             },
             breakpoint(swiper) {
-              applyCardStackEffect(swiper);
+              handleCardEffectByWidth(swiper);
             },
           },
         });
       }
+
+      window.addEventListener(
+        "resize",
+        debounce(() => {
+          swiperInstances.forEach(({ swiper }) => {
+            if (swiper.el.classList.contains("swiper-cards")) {
+              handleCardEffectByWidth(swiper);
+            }
+          });
+        }, 300)
+      );
     };
+
     document.body.appendChild(script);
-  });
+  }
+
+  window.Webflow ||= [];
+  window.Webflow.push(initAllSwipers);
 });

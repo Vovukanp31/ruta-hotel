@@ -205,7 +205,6 @@ document.addEventListener("DOMContentLoaded", () => {
           allowTouchMove: true,
           slidesPerView: "auto",
           slidesPerGroup: 1,
-          centeredSlides: true,
           spaceBetween: -0.5 * slideWidth,
           breakpoints: {
             768: {

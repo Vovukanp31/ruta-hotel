@@ -1,6 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
   const swiperInstances = [];
 
+  function fixAriaRoles() {
+    document
+      .querySelectorAll('.swiper-wrapper[role="list"]')
+      .forEach((wrapper) => {
+        wrapper
+          .querySelectorAll('.swiper-slide[role="group"]')
+          .forEach((slide) => {
+            slide.setAttribute("role", "listitem");
+          });
+      });
+  }
+
   function initCustomSwiper(selector, options = {}) {
     document.querySelectorAll(selector).forEach((swiperEl, index) => {
       const slides = swiperEl.querySelectorAll(".swiper-slide");
@@ -56,6 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
       swiper.on("slideChange", () =>
         updateNavState(swiper, nextBtns, prevBtns)
       );
+
+      fixAriaRoles();
       updateNavState(swiper, nextBtns, prevBtns);
     });
   }
@@ -233,6 +247,8 @@ document.addEventListener("DOMContentLoaded", () => {
           },
         });
       }
+
+      fixAriaRoles();
 
       window.addEventListener(
         "resize",

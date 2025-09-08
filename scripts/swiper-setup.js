@@ -50,6 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return acc;
       }, {});
 
+      if (swiperEl.classList.contains("swiper-loop")) {
+        options.loop = true;
+      }
+
       const swiper = new Swiper(`.${uniqueClass}`, {
         ...options,
         breakpoints: mergedBreakpoints,
@@ -203,7 +207,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (needsGallery) {
         initCustomSwiper(".gallery-image-slider", {
           observer: true,
-          loop: true,
           observeParents: true,
           centeredSlides: false,
         });
@@ -219,7 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
           centeredSlides: true,
           allowTouchMove: true,
           slidesPerView: "auto",
-          loop: true,
           slidesPerGroup: 1,
           spaceBetween: -0.5 * slideWidth,
           breakpoints: {

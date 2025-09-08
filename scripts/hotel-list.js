@@ -39,7 +39,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   allLists.forEach((list) => {
     const showMoreBtn = list.querySelector(".cms-list-opener");
-    if (!showMoreBtn) return;
+    if (!showMoreBtn) {
+      updateReverseClasses(list);
+      return;
+    }
 
     const roomCards = Array.from(
       list.querySelectorAll(".card-hotel-room-container")

@@ -37,6 +37,13 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         : {};
 
+      if (swiperEl.classList.contains("mobile-slides-start")) {
+        mergedBreakpoints[0] = {
+          ...(mergedBreakpoints[0] || {}),
+          centeredSlides: false,
+        };
+      }
+
       const optionBreakpoints = options.breakpoints || {};
 
       const mergedBreakpoints = Object.keys({
@@ -52,13 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (swiperEl.classList.contains("swiper-loop")) {
         options.loop = true;
-      }
-
-      if (swiperEl.classList.contains("mobile-slides-start")) {
-        mergedBreakpoints[0] = {
-          ...(mergedBreakpoints[0] || {}),
-          centeredSlides: false,
-        };
       }
 
       const swiper = new Swiper(`.${uniqueClass}`, {

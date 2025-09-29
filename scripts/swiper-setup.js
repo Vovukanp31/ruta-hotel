@@ -55,9 +55,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (swiperEl.classList.contains("mobile-slides-start")) {
-        options.breakpoints = {
-          ...(options.breakpoints || {}),
-          0: { centeredSlides: false },
+        mergedBreakpoints[0] = {
+          ...(mergedBreakpoints[0] || {}),
+          centeredSlides: false,
         };
       }
 

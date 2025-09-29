@@ -37,14 +37,14 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         : {};
 
+      const optionBreakpoints = options.breakpoints || {};
+
       if (swiperEl.classList.contains("mobile-slides-start")) {
-        mergedBreakpoints[0] = {
-          ...(mergedBreakpoints[0] || {}),
+        optionBreakpoints[0] = {
+          ...(optionBreakpoints[0] || {}),
           centeredSlides: false,
         };
       }
-
-      const optionBreakpoints = options.breakpoints || {};
 
       const mergedBreakpoints = Object.keys({
         ...customBreakpoints,

@@ -66,6 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
         breakpoints: mergedBreakpoints,
       });
 
+      console.log("Initialized Swiper:", swiper);
+
       nextBtns.forEach((btn) =>
         btn.addEventListener("click", () => swiper.slideNext())
       );

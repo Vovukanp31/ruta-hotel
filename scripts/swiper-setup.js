@@ -33,10 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (swiperEl.classList.contains("mobile-slides-start")) {
-      localOptions.breakpoints[0] = {
-        ...(localOptions.breakpoints[0] || {}),
-        centeredSlides: false,
-      };
+      localOptions.centeredSlides = false;
     }
 
     if (swiperEl.classList.contains("swiper-loop")) {

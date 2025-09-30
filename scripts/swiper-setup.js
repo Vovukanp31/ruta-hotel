@@ -34,6 +34,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (swiperEl.classList.contains("mobile-slides-start")) {
       localOptions.centeredSlides = false;
+      localOptions.slidesOffsetAfter = 30;
+
+      localOptions.breakpoints[768] = {
+        ...(localOptions.breakpoints[768] || {}),
+        slidesOffsetAfter: 0,
+      };
+      localOptions.breakpoints[992] = {
+        ...(localOptions.breakpoints[992] || {}),
+        slidesOffsetAfter: 0,
+      };
     }
 
     if (swiperEl.classList.contains("swiper-loop")) {

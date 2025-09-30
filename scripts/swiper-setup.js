@@ -155,8 +155,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const swiper = new Swiper(`.${uniqueClass}`, localOptions);
 
-      console.log("Initialized Swiper:", swiper);
-
       nextBtns.forEach((btn) =>
         btn.addEventListener("click", () => swiper.slideNext())
       );

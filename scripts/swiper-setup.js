@@ -13,83 +13,41 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  function initCustomSwiper(selector, options = {}) {
-    document.querySelectorAll(selector).forEach((swiperEl, index) => {
-      const slides = swiperEl.querySelectorAll(".swiper-slide");
-      if (slides.length === 0) return;
+  function buildLocalOptions(swiperEl, baseOptions = {}) {
+    const localOptions = {
+      ...baseOptions,
+      breakpoints: { ...(baseOptions.breakpoints || {}) },
+    };
 
-      const parent = swiperEl.closest(".swiper-slider");
-      const nextBtns = parent?.querySelectorAll(".slider-button-right") || [];
-      const prevBtns = parent?.querySelectorAll(".slider-button-left") || [];
-      if (!parent || nextBtns.length === 0 || prevBtns.length === 0) return;
+    if (swiperEl.classList.contains("swiper-3-per-slide")) {
+      localOptions.breakpoints[768] = {
+        ...(localOptions.breakpoints[768] || {}),
+        slidesPerView: 3,
+        slidesPerGroup: 3,
+      };
+      localOptions.breakpoints[992] = {
+        ...(localOptions.breakpoints[992] || {}),
+        slidesPerView: 3,
+        slidesPerGroup: 3,
+      };
+    }
 
-      const uniqueClass = `${selector
-        .replace(".", "")
-        .replace(/[^a-zA-Z0-9_-]/g, "")}-instance-${index}`;
-      swiperEl.classList.add(uniqueClass);
+    if (swiperEl.classList.contains("mobile-slides-start")) {
+      localOptions.breakpoints[0] = {
+        ...(localOptions.breakpoints[0] || {}),
+        centeredSlides: false,
+      };
+    }
 
-      const isThreePerSlide = swiperEl.classList.contains("swiper-3-per-slide");
+    if (swiperEl.classList.contains("swiper-loop")) {
+      localOptions.loop = true;
+    }
 
-      const customBreakpoints = isThreePerSlide
-        ? {
-            768: { slidesPerView: 3, slidesPerGroup: 3 },
-            992: { slidesPerView: 3, slidesPerGroup: 3 },
-          }
-        : {};
-
-      const optionBreakpoints = options.breakpoints || {};
-
-      if (swiperEl.classList.contains("mobile-slides-start")) {
-        optionBreakpoints[0] = {
-          ...(optionBreakpoints[0] || {}),
-          centeredSlides: false,
-        };
-      }
-
-      const mergedBreakpoints = Object.keys({
-        ...customBreakpoints,
-        ...optionBreakpoints,
-      }).reduce((acc, key) => {
-        acc[key] = {
-          ...(customBreakpoints[key] || {}),
-          ...(optionBreakpoints[key] || {}),
-        };
-        return acc;
-      }, {});
-
-      if (swiperEl.classList.contains("swiper-loop")) {
-        options.loop = true;
-      }
-
-      const swiper = new Swiper(`.${uniqueClass}`, {
-        ...options,
-        breakpoints: mergedBreakpoints,
-      });
-
-      console.log("Initialized Swiper:", swiper);
-
-      nextBtns.forEach((btn) =>
-        btn.addEventListener("click", () => swiper.slideNext())
-      );
-      prevBtns.forEach((btn) =>
-        btn.addEventListener("click", () => swiper.slidePrev())
-      );
-
-      swiperInstances.push({ swiper, swiperEl });
-
-      swiper.on("init", () => updateNavState(swiper, nextBtns, prevBtns));
-      swiper.on("slideChange", () =>
-        updateNavState(swiper, nextBtns, prevBtns)
-      );
-
-      fixAriaRoles();
-      updateNavState(swiper, nextBtns, prevBtns);
-    });
+    return localOptions;
   }
 
   function updateNavState(swiper, nextBtns, prevBtns) {
     const { isEnd, isBeginning } = swiper;
-
     const toggleButtonState = (btn, state) =>
       btn.classList[state ? "add" : "remove"]("disabled");
 
@@ -181,6 +139,46 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function initCustomSwiper(selector, options = {}) {
+    document.querySelectorAll(selector).forEach((swiperEl, index) => {
+      const slides = swiperEl.querySelectorAll(".swiper-slide");
+      if (slides.length === 0) return;
+
+      const parent = swiperEl.closest(".swiper-slider");
+      const nextBtns = parent?.querySelectorAll(".slider-button-right") || [];
+      const prevBtns = parent?.querySelectorAll(".slider-button-left") || [];
+      if (!parent || nextBtns.length === 0 || prevBtns.length === 0) return;
+
+      const uniqueClass = `${selector
+        .replace(".", "")
+        .replace(/[^a-zA-Z0-9_-]/g, "")}-instance-${index}`;
+      swiperEl.classList.add(uniqueClass);
+
+      const localOptions = buildLocalOptions(swiperEl, options);
+
+      const swiper = new Swiper(`.${uniqueClass}`, localOptions);
+
+      console.log("Initialized Swiper:", swiper);
+
+      nextBtns.forEach((btn) =>
+        btn.addEventListener("click", () => swiper.slideNext())
+      );
+      prevBtns.forEach((btn) =>
+        btn.addEventListener("click", () => swiper.slidePrev())
+      );
+
+      swiperInstances.push({ swiper, swiperEl });
+
+      swiper.on("init", () => updateNavState(swiper, nextBtns, prevBtns));
+      swiper.on("slideChange", () =>
+        updateNavState(swiper, nextBtns, prevBtns)
+      );
+
+      fixAriaRoles();
+      updateNavState(swiper, nextBtns, prevBtns);
+    });
+  }
+
   function initAllSwipers() {
     const needsBasic = document.querySelector(".basic-swiper");
     const needsGallery = document.querySelector(".gallery-image-slider");
@@ -200,10 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
           allowTouchMove: true,
           spaceBetween: 8,
           breakpoints: {
-            768: {
-              centeredSlides: false,
-              allowTouchMove: false,
-            },
+            768: { centeredSlides: false, allowTouchMove: false },
             992: {
               centeredSlides: false,
               allowTouchMove: false,
